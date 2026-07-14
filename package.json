@@ -24,7 +24,6 @@
     "build": "tsc -b",
     "dev": "tsc -b --watch",
     "clean": "rm -rf dist *.tsbuildinfo",
-    "prepare": "tsc -b",
     "test": "vitest run",
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage",

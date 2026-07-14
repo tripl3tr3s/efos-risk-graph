@@ -3,7 +3,10 @@ node_modules/
 .pnpm-store/
 
 # Build output
-dist/
+# NOTE: dist/ is intentionally committed. This package is consumed as a git
+# dependency (no npm publish); shipping prebuilt dist means consumers never run
+# a build script on install, so no pnpm allowBuilds gate or nested-workspace
+# breakage across pnpm 9/10/11. Rebuild with `pnpm build` before tagging.
 build/
 *.tsbuildinfo
 
