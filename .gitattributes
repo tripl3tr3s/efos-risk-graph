@@ -1,0 +1,7 @@
+# Keep dev-only files out of the published git-archive tarball (npm/pnpm git deps).
+# pnpm-workspace.yaml here is settings-only (esbuild build approval for local
+# `pnpm test`); shipping it breaks consumers' nested prepare install under pnpm 9
+# ("packages field missing or empty"). Strip it from the archive; keep it locally.
+pnpm-workspace.yaml export-ignore
+.gitattributes export-ignore
+.gitignore export-ignore
