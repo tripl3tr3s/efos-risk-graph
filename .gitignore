@@ -1,6 +1,39 @@
+# Dependencies
 node_modules/
+.pnpm-store/
+
+# Build output
 dist/
-coverage/
+build/
 *.tsbuildinfo
+
+# Test / coverage
+coverage/
+.nyc_output/
+*.lcov
+
+# Caches
+.cache/
+.vitest/
+.eslintcache
+
+# Environment / secrets
+.env
+.env.*
+!.env.example
+
+# Editor / OS
 .DS_Store
+Thumbs.db
+.idea/
+.vscode/*
+!.vscode/extensions.json
+*.swp
+
+# Logs
 *.log
+npm-debug.log*
+pnpm-debug.log*
+
+# Packaged tarballs
+*.tgz
