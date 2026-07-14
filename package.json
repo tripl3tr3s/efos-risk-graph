@@ -1,0 +1,55 @@
+{
+  "name": "efos-risk-graph",
+  "version": "0.1.0",
+  "description": "Open-source directed-graph engine for Mexican SAT Art. 69-B (EFOS/EDOS) fiscal-risk propagation. Parses the official 69-B list, propagates blacklist risk across billing relationships with per-level attenuation, and detects invoicing carousels.",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "./demo": {
+      "types": "./dist/demo/synthetic.d.ts",
+      "default": "./dist/demo/synthetic.js"
+    }
+  },
+  "files": [
+    "dist",
+    "docs",
+    "README.md"
+  ],
+  "scripts": {
+    "build": "tsc -b",
+    "dev": "tsc -b --watch",
+    "clean": "rm -rf dist *.tsbuildinfo",
+    "prepare": "tsc -b",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage",
+    "type-check": "tsc --noEmit"
+  },
+  "dependencies": {
+    "zod": "^3.24.1"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "@vitest/coverage-v8": "^2.1.9",
+    "typescript": "^5.7.2",
+    "vitest": "^2.1.8"
+  },
+  "keywords": [
+    "sat",
+    "cfdi",
+    "efos",
+    "edos",
+    "69-b",
+    "lista-negra",
+    "fiscal-risk",
+    "graph",
+    "bfs",
+    "mexico"
+  ],
+  "license": "MIT"
+}
