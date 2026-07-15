@@ -5,6 +5,8 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-black.svg)](./LICENSE)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.x-black.svg)](https://www.typescriptlang.org/)
 
+**English** · [Español](./README.es.md)
+
 The SAT publishes a list of ~14,000 taxpayers presumed or confirmed to issue simulated invoices (**EFOS**). Checking whether *your* supplier is on that list is easy - a lookup. The question that actually protects a deduction is harder:
 
 > **How many hops am I from an EFOS?**

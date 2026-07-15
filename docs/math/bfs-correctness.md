@@ -1,5 +1,7 @@
 # Correctness of the BFS propagation
 
+**English** · [Español](./bfs-correctness.es.md)
+
 We claim that a single breadth-first search, recording each node the first time it is discovered, computes the exact maximum-attenuated risk for every reachable EFOS.
 
 ## Setup

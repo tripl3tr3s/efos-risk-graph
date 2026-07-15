@@ -1,5 +1,7 @@
 # Geometric convergence and the depth cutoff
 
+**English** · [Español](./geometric-convergence.es.md)
+
 Truncating the BFS at 2 or 3 levels is often treated as a performance hack. It is not: with attenuation it is a quantified approximation whose discarded mass is bounded by the tail of a geometric series.
 
 ## The bound

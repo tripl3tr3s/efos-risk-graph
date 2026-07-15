@@ -1,5 +1,7 @@
 # Complexity
 
+**English** · [Español](./complexity.es.md)
+
 Let $V$ be the number of RFCs (nodes) reachable within the depth budget and $E$ the number of billing edges among them.
 
 ## Proximity BFS - $O(V + E)$ time, $O(V)$ space
