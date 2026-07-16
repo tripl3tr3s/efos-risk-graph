@@ -2,10 +2,15 @@
 
 > Fiscal-risk propagation for the Mexican SAT **Art. 69-B** blacklist (EFOS/EDOS), worked out from the math up.
 
+[![npm version](https://img.shields.io/npm/v/efos-risk-graph.svg?color=black)](https://www.npmjs.com/package/efos-risk-graph)
 [![License: MIT](https://img.shields.io/badge/License-MIT-black.svg)](./LICENSE)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.x-black.svg)](https://www.typescriptlang.org/)
 
 **English** · [Español](./README.es.md)
+
+```bash
+pnpm add efos-risk-graph
+```
 
 The SAT publishes a list of ~14,000 taxpayers presumed or confirmed to issue simulated invoices (**EFOS**). Checking whether *your* supplier is on that list is easy - a lookup. The question that actually protects a deduction is harder:
 
@@ -58,22 +63,33 @@ A simulated-invoicing *carrusel* - `A -> B -> C -> A` - is exactly a directed cy
 ```ts
 import { buildGraph, analyzeProximity, detectCarousels } from 'efos-risk-graph';
 
-// edges come from YOUR data (CFDIs); the engine never fetches them
+// A client, MI-CLIENTE, with three direct suppliers. Edges come from YOUR
+// data (CFDIs) - `de` billed `a`. The engine never fetches them.
 const graph = buildGraph([
-  { de: 'EFO010101AA1', a: 'CLI010101AA1' }, // an EFOS billed the client
-  { de: 'EFO020202AA1', a: 'MID010101AA1' }, // an EFOS billed a clean intermediary
-  { de: 'MID010101AA1', a: 'CLI010101AA1' }, // ...who billed the client
+  { de: 'PROV-LIMPIO01', a: 'MI-CLIENTE01' },  // clean supplier
+  { de: 'PROV-DESVIR01', a: 'MI-CLIENTE01' },  // direct supplier, but already cleared (Desvirtuado)
+  { de: 'PROV-INTERM01', a: 'MI-CLIENTE01' },  // looks clean itself...
+  { de: 'EFOS-DEFINI01', a: 'PROV-INTERM01' }, // ...but ITS supplier is a confirmed EFOS (Definitivo)
 ]);
 
-// weightOf is injected: return a base weight in [0,1] for any RFC
-const definitivo = new Set(['EFO010101AA1', 'EFO020202AA1']);
-const weightOf = (rfc: string) => (definitivo.has(rfc) ? 1.0 : 0);
+// weightOf is injected: return a base weight in [0,1] for any RFC.
+// Definitivo = 1.0, Desvirtuado = 0.05, everyone else 0.
+const situacion: Record<string, number> = {
+  'EFOS-DEFINI01': 1.0,
+  'PROV-DESVIR01': 0.05,
+};
+const weightOf = (rfc: string) => situacion[rfc] ?? 0;
 
-const r = analyzeProximity(graph, 'CLI010101AA1', weightOf, { alpha: 0.5, maxDepth: 3 });
-console.log(r.score);                 // 0.5  (direct EFOS at alpha^1)
-console.log(r.contributions[0].camino); // ['CLI010101AA1', 'EFO010101AA1']
-console.log(detectCarousels(graph)); // []
+const r = analyzeProximity(graph, 'MI-CLIENTE01', weightOf, { alpha: 0.5, maxDepth: 3 });
+
+// Every direct supplier looks fine, yet the real exposure sits two hops back:
+console.log(r.score); // 0.25  ->  1.0 * 0.5^2, the Definitivo behind the clean intermediary
+console.log(r.contributions[0].camino);
+// ['MI-CLIENTE01', 'PROV-INTERM01', 'EFOS-DEFINI01']  <- the chain that explains the score
+console.log(detectCarousels(graph)); // []  (no billing cycle here)
 ```
+
+The score is the **single worst chain** (a bottleneck, not a sum), and it always comes back with the path that justifies it - which is what you show an auditor.
 
 Run the bundled synthetic network (20 fictional RFCs) and the full suite:
 
@@ -95,6 +111,28 @@ The demo graph ([`src/demo/synthetic.ts`](./src/demo/synthetic.ts)) hides four D
 | DES010101AA1 | Desvirtuado | 1   | $0.05 \cdot 0.5$            | 0.025 |
 
 So $\text{riesgo}(\text{CLIENTE}) = \max = \boxed{0.5}$, from the direct Definitivo. A fourth Definitivo sits **four** hops away and is correctly excluded by the depth cutoff. The carousel `CAR01 -> CAR02 -> CAR03 -> CAR01` is the single detected cycle. Every one of these numbers is asserted in [`test/propagate.test.ts`](./test/propagate.test.ts).
+
+## Bring Your Own Edges
+
+The engine is deliberately incomplete: it never learns edges on its own. To wire it into any fiscal system you supply the two things it refuses to own - the **billing edges** (from your data) and the **weight resolver** (from your copy of the 69-B list):
+
+```ts
+import { buildGraph, analyzeProximity, parseLista69B, weightResolverFrom } from 'efos-risk-graph';
+
+// 1. Edges: derive `emisor -> receptor` pairs from your own CFDIs.
+//    This is the private half - it stays inside your system, never here.
+const edges = miFuenteDeCFDIs().map((cfdi) => ({ de: cfdi.rfcEmisor, a: cfdi.rfcReceptor }));
+const graph = buildGraph(edges);
+
+// 2. Weights: build a resolver from the official 69-B CSV,
+//    or inject your own if you already keep the list in a database.
+const weightOf = weightResolverFrom(parseLista69B(csv69bText));
+
+// 3. Score any client. The result is a number plus the chain that explains it.
+const { score, contributions } = analyzeProximity(graph, 'RFC-DEL-CLIENTE', weightOf);
+```
+
+This is the whole open-core seam: **the engine and 69-B parser are public; where your edges come from is private and never touches this package.** A product with its own 69-B store just injects `weightOf` directly and skips the parser.
 
 ## Repository Layout
 

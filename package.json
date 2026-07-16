@@ -1,7 +1,14 @@
 {
   "name": "efos-risk-graph",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Open-source directed-graph engine for Mexican SAT Art. 69-B (EFOS/EDOS) fiscal-risk propagation. Parses the official 69-B list, propagates blacklist risk across billing relationships with per-level attenuation, and detects invoicing carousels.",
+  "author": "tripl3tr3s",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/tripl3tr3s/efos-risk-graph.git"
+  },
+  "homepage": "https://github.com/tripl3tr3s/efos-risk-graph#readme",
+  "bugs": "https://github.com/tripl3tr3s/efos-risk-graph/issues",
   "type": "module",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
